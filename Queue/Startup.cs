@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MySql.Data.MySqlClient;
+using Queue.Repositories;
 
 namespace Queue
 {
@@ -13,12 +15,23 @@ namespace Queue
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSingleton(
+                new MySqlConnection(new MySqlConnectionStringBuilder
+                {
+                    Server = "localhost",
+                    UserID = "root",
+                    Password = "root",
+                    Database = "queue"
+                }.ConnectionString));
+
+            services.AddSingleton<IConstraintsRepository, ConstraintsRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
