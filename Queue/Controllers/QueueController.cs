@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Queue.Model;
 using Queue.Repositories;
 
 namespace Queue.Controllers
@@ -25,5 +26,11 @@ namespace Queue.Controllers
             var constraints = await ConstraintsRepository.Get(Queue);
             return constraints.Count().ToString();
         }
+
+        [HttpPost]
+        public async Task Create(Constraint constraint) => await ConstraintsRepository.Add(Queue, constraint);
+
+        [HttpDelete]
+        public async Task Delete(Guid id) => await ConstraintsRepository.Delete(id);
     }
 }

@@ -7,6 +7,6 @@ namespace Queue.Model
     {
         public Guid Id { get; }
         
-        public IEnumerable<Constraint> Constraints { get; }
+        public long Mask { get; }
     }
 }
