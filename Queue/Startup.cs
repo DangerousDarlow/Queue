@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,11 +37,15 @@ namespace Queue
 
             services.AddSingleton<IConstraintsService, ConstraintsService>();
             services.AddSingleton<IConstraintsRepository, ConstraintsRepository>();
+            services.AddSingleton<IQueueRepository, QueueRepository>();
             services.AddSingleton<ISequence, PowersOfTwoSequence>();
 
             SqlMapper.AddTypeHandler(new GuidTypeHandler());
             SqlMapper.RemoveTypeMap(typeof(Guid));
             SqlMapper.RemoveTypeMap(typeof(Guid?));
+
+            services.AddMvc()
+                .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
