@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Queue.Model;
 
 namespace Queue.Services
 {
-    public class PrimeNumberSequence : ISequence
+    public class PrimesSequence : ISequence
     {
         private static readonly long[] Primes =
         {
@@ -15,6 +16,8 @@ namespace Queue.Services
             499L, 503L, 509L, 521L, 523L, 541L, 547L, 557L, 563L, 569L, 571L, 577L, 587L, 593L, 599L, 601L, 607L, 613L,
             617L, 619L, 631L, 641L, 643L, 647L, 653L, 659L, 661L, 673L, 677L, 683L, 691L, 701L, 709L, 719L
         };
+
+        public QueueMaskType Type { get; } = QueueMaskType.Prime;
 
         public long FirstNotIn(IEnumerable<long> exclude)
         {

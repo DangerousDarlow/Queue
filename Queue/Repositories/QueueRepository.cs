@@ -32,9 +32,9 @@ namespace Queue.Repositories
         {
             await OpenConnectionIfNotOpen();
 
-            const string query = "SELECT BIN_TO_UUID(id) AS queueId, type FROM queues WHERE id = @queueId";
+            const string query = "SELECT BIN_TO_UUID(id) AS queueId, type FROM queues WHERE id = UUID_TO_BIN(@queueId)";
 
-            return await Connection.ExecuteScalarAsync<Model.Queue>(query, new {queueId});
+            return await Connection.QuerySingleAsync<Model.Queue>(query, new {queueId});
         }
 
         public async Task Create(Model.Queue queue)

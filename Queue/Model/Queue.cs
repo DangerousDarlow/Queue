@@ -13,10 +13,4 @@ namespace Queue.Model
         public Guid QueueId { get; }
         public QueueMaskType Type { get; }
     }
-
-    public enum QueueMaskType
-    {
-        Binary,
-        Prime
-    }
 }

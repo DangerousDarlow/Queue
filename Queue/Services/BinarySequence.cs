@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Queue.Model;
 
 namespace Queue.Services
 {
-    public class PowersOfTwoSequence : ISequence
+    public class BinarySequence : ISequence
     {
+        public QueueMaskType Type { get; } = QueueMaskType.Binary;
+
         public long FirstNotIn(IEnumerable<long> exclude)
         {
             var excludeList = exclude.ToList();

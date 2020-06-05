@@ -37,9 +37,9 @@ namespace Queue.Repositories
             await OpenConnectionIfNotOpen();
 
             const string query =
-                "SELECT BIN_TO_UUID(id) AS constraintId, BIN_TO_UUID(queue) AS queueId, mask, name FROM constraints WHERE id = @constraintId";
+                "SELECT BIN_TO_UUID(id) AS constraintId, BIN_TO_UUID(queue) AS queueId, mask, name FROM constraints WHERE id = UUID_TO_BIN(@constraintId)";
 
-            return await Connection.ExecuteScalarAsync<Constraint>(query, new {constraintId});
+            return await Connection.QuerySingleAsync<Constraint>(query, new {constraintId});
         }
 
         public async Task<IEnumerable<long>> GetMasks(Guid queueId)

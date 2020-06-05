@@ -19,16 +19,16 @@ namespace Queue.Services
         public ConstraintsService(
             IConstraintsRepository constraintsRepository,
             IQueueRepository queueRepository,
-            ISequence sequence)
+            ISequenceSelector sequenceSelector)
         {
             ConstraintsRepository = constraintsRepository;
             QueueRepository = queueRepository;
-            Sequence = sequence;
+            SequenceSelector = sequenceSelector;
         }
 
         private IConstraintsRepository ConstraintsRepository { get; }
         private IQueueRepository QueueRepository { get; }
-        private ISequence Sequence { get; }
+        private ISequenceSelector SequenceSelector { get; }
 
         public Task<IEnumerable<Constraint>> GetAll(Guid queueId)
         {
@@ -44,7 +44,8 @@ namespace Queue.Services
         {
             var masks = await ConstraintsRepository.GetMasks(queueId);
             var queue = await QueueRepository.Get(queueId);
-            var constraint = new Constraint(Guid.NewGuid(), queueId, Sequence.FirstNotIn(masks), name);
+            var sequence = SequenceSelector.Select(queue.Type);
+            var constraint = new Constraint(Guid.NewGuid(), queueId, sequence.FirstNotIn(masks), name);
             await ConstraintsRepository.Create(queueId, constraint);
             return constraint;
         }
