@@ -34,9 +34,10 @@ namespace Queue
                     Database = "queue"
                 }.ConnectionString));
 
+            services.AddSingleton<IConstraintsService, ConstraintsService>();
             services.AddSingleton<IConstraintsRepository, ConstraintsRepository>();
             services.AddSingleton<ISequence, PowersOfTwoSequence>();
-            
+
             SqlMapper.AddTypeHandler(new GuidTypeHandler());
             SqlMapper.RemoveTypeMap(typeof(Guid));
             SqlMapper.RemoveTypeMap(typeof(Guid?));

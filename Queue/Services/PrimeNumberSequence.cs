@@ -16,6 +16,9 @@ namespace Queue.Services
             617L, 619L, 631L, 641L, 643L, 647L, 653L, 659L, 661L, 673L, 677L, 683L, 691L, 701L, 709L, 719L
         };
 
-        public long FirstNotIn(IEnumerable<long> exclude) => Primes.First(prime => !exclude.Contains(prime));
+        public long FirstNotIn(IEnumerable<long> exclude)
+        {
+            return Primes.First(prime => !exclude.Contains(prime));
+        }
     }
 }

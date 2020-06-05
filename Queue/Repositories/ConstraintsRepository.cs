@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using MySql.Data.MySqlClient;
-using Queue.Services;
 using Constraint = Queue.Model.Constraint;
 
 namespace Queue.Repositories
@@ -13,20 +12,19 @@ namespace Queue.Repositories
     public interface IConstraintsRepository
     {
         Task<IEnumerable<Constraint>> GetAll(Guid queue);
-        Task<Constraint> Create(Guid queue, string name);
+        Task<IEnumerable<long>> GetMasks(Guid queue);
+        Task<Constraint> Create(Guid queue, Constraint constraint);
         Task Delete(Guid id);
     }
 
     public class ConstraintsRepository : IConstraintsRepository
     {
-        public ConstraintsRepository(MySqlConnection connection, ISequence sequence)
+        public ConstraintsRepository(MySqlConnection connection)
         {
             Connection = connection;
-            Sequence = sequence;
         }
 
         private MySqlConnection Connection { get; }
-        private ISequence Sequence { get; }
 
         public async Task<IEnumerable<Constraint>> GetAll(Guid queue)
         {
@@ -38,13 +36,18 @@ namespace Queue.Repositories
             return (await Connection.QueryAsync<Constraint>(query, new {queue})).ToList();
         }
 
-        public async Task<Constraint> Create(Guid queue, string name)
+        public async Task<IEnumerable<long>> GetMasks(Guid queue)
         {
             await OpenConnectionIfNotOpen();
 
-            var masks = await GetCurrentMasks(queue);
+            const string query = "SELECT mask FROM queue.constraints WHERE queue = UUID_TO_BIN(@queue) ORDER BY mask";
 
-            var constraint = new Constraint(Guid.NewGuid(), queue, Sequence.FirstNotIn(masks), name);
+            return await Connection.QueryAsync<long>(query, new {queue});
+        }
+
+        public async Task<Constraint> Create(Guid queue, Constraint constraint)
+        {
+            await OpenConnectionIfNotOpen();
 
             const string query =
                 "INSERT INTO constraints(id, queue, mask, name) VALUES(UUID_TO_BIN(@id), UUID_TO_BIN(@queue), @mask, @name)";
@@ -67,12 +70,6 @@ namespace Queue.Repositories
         {
             if (Connection.State != ConnectionState.Open)
                 await Connection.OpenAsync();
-        }
-
-        private Task<IEnumerable<long>> GetCurrentMasks(Guid queue)
-        {
-            const string query = "SELECT mask FROM queue.constraints WHERE queue = UUID_TO_BIN(@queue) ORDER BY mask";
-            return Connection.QueryAsync<long>(query, new {queue});
         }
     }
 }

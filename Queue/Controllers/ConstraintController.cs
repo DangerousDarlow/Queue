@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Queue.Model;
-using Queue.Repositories;
+using Queue.Services;
 
 namespace Queue.Controllers
 {
@@ -11,30 +11,30 @@ namespace Queue.Controllers
     [Route("[controller]")]
     public class ConstraintController : ControllerBase
     {
-        public ConstraintController(IConstraintsRepository constraintsRepository)
+        public ConstraintController(IConstraintsService constraintsService)
         {
-            ConstraintsRepository = constraintsRepository;
+            ConstraintsService = constraintsService;
         }
 
-        private IConstraintsRepository ConstraintsRepository { get; }
+        public IConstraintsService ConstraintsService { get; }
 
         [HttpGet]
         [Route("/constraints")]
         public async Task<IEnumerable<Constraint>> GetAll([FromForm] Guid queue)
         {
-            return await ConstraintsRepository.GetAll(queue);
+            return await ConstraintsService.GetAll(queue);
         }
 
         [HttpPost]
         public async Task<Constraint> Create([FromForm] Guid queue, [FromForm] string name)
         {
-            return await ConstraintsRepository.Create(queue, name);
+            return await ConstraintsService.Create(queue, name);
         }
 
         [HttpDelete]
         public async Task Delete([FromForm] Guid id)
         {
-            await ConstraintsRepository.Delete(id);
+            await ConstraintsService.Delete(id);
         }
     }
 }
