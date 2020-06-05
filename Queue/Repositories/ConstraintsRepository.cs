@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using MySql.Data.MySqlClient;
-using Constraint = Queue.Model.Constraint;
+using Queue.Model;
 
 namespace Queue.Repositories
 {
@@ -17,14 +16,11 @@ namespace Queue.Repositories
         Task Delete(Guid id);
     }
 
-    public class ConstraintsRepository : IConstraintsRepository
+    public class ConstraintsRepository : Repository, IConstraintsRepository
     {
-        public ConstraintsRepository(MySqlConnection connection)
+        public ConstraintsRepository(MySqlConnection connection) : base(connection)
         {
-            Connection = connection;
         }
-
-        private MySqlConnection Connection { get; }
 
         public async Task<IEnumerable<Constraint>> GetAll(Guid queue)
         {
@@ -62,12 +58,6 @@ namespace Queue.Repositories
             const string query = "DELETE FROM constraints WHERE id = UUID_TO_BIN(@id)";
 
             await Connection.ExecuteAsync(query, new {id});
-        }
-
-        private async Task OpenConnectionIfNotOpen()
-        {
-            if (Connection.State != ConnectionState.Open)
-                await Connection.OpenAsync();
         }
     }
 }
