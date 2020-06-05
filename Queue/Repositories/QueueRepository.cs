@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using MySql.Data.MySqlClient;
@@ -8,6 +9,7 @@ namespace Queue.Repositories
     public interface IQueueRepository
     {
         Task<IEnumerable<Model.Queue>> GetAll();
+        Task<Model.Queue> Get(Guid queueId);
         Task Create(Model.Queue queue);
     }
 
@@ -21,16 +23,25 @@ namespace Queue.Repositories
         {
             await OpenConnectionIfNotOpen();
 
-            const string query = "SELECT BIN_TO_UUID(id) AS id, type FROM queues";
+            const string query = "SELECT BIN_TO_UUID(id) AS queueId, type FROM queues";
 
             return await Connection.QueryAsync<Model.Queue>(query);
+        }
+
+        public async Task<Model.Queue> Get(Guid queueId)
+        {
+            await OpenConnectionIfNotOpen();
+
+            const string query = "SELECT BIN_TO_UUID(id) AS queueId, type FROM queues WHERE id = @queueId";
+
+            return await Connection.ExecuteScalarAsync<Model.Queue>(query, new {queueId});
         }
 
         public async Task Create(Model.Queue queue)
         {
             await OpenConnectionIfNotOpen();
 
-            const string query = "INSERT INTO queues(id, type) VALUES(UUID_TO_BIN(@id), @type)";
+            const string query = "INSERT INTO queues(id, type) VALUES(UUID_TO_BIN(@queueId), @type)";
 
             await Connection.ExecuteAsync(query, queue);
         }

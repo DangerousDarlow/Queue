@@ -9,17 +9,17 @@ namespace Queue.Model
         {
         }
 
-        public Constraint(Guid id, Guid queue, long mask, string name)
+        public Constraint(Guid constraintId, Guid queueId, long mask, string name)
         {
-            Id = id;
-            Queue = queue;
+            ConstraintId = constraintId;
+            QueueId = queueId;
             Mask = mask;
             Name = name;
         }
 
-        public Guid Id { get; }
+        public Guid ConstraintId { get; }
 
-        public Guid Queue { get; }
+        public Guid QueueId { get; }
 
         public long Mask { get; }
 

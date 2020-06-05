@@ -8,40 +8,50 @@ namespace Queue.Services
 {
     public interface IConstraintsService
     {
-        Task<IEnumerable<Constraint>> GetAll(Guid queue);
-        Task<Constraint> Create(Guid queue, string name);
-        Task Delete(Guid id);
+        Task<IEnumerable<Constraint>> GetAll(Guid queueId);
+        Task<Constraint> Get(Guid constraintId);
+        Task<Constraint> Create(Guid queueId, string name);
+        Task Delete(Guid constraintId);
     }
 
     public class ConstraintsService : IConstraintsService
     {
         public ConstraintsService(
             IConstraintsRepository constraintsRepository,
+            IQueueRepository queueRepository,
             ISequence sequence)
         {
             ConstraintsRepository = constraintsRepository;
+            QueueRepository = queueRepository;
             Sequence = sequence;
         }
 
         private IConstraintsRepository ConstraintsRepository { get; }
+        private IQueueRepository QueueRepository { get; }
         private ISequence Sequence { get; }
 
-        public async Task<Constraint> Create(Guid queue, string name)
+        public Task<IEnumerable<Constraint>> GetAll(Guid queueId)
         {
-            var masks = await ConstraintsRepository.GetMasks(queue);
-            var constraint = new Constraint(Guid.NewGuid(), queue, Sequence.FirstNotIn(masks), name);
-            await ConstraintsRepository.Create(queue, constraint);
+            return ConstraintsRepository.GetAll(queueId);
+        }
+
+        public Task<Constraint> Get(Guid constraintId)
+        {
+            return ConstraintsRepository.Get(constraintId);
+        }
+
+        public async Task<Constraint> Create(Guid queueId, string name)
+        {
+            var masks = await ConstraintsRepository.GetMasks(queueId);
+            var queue = await QueueRepository.Get(queueId);
+            var constraint = new Constraint(Guid.NewGuid(), queueId, Sequence.FirstNotIn(masks), name);
+            await ConstraintsRepository.Create(queueId, constraint);
             return constraint;
         }
 
-        public Task<IEnumerable<Constraint>> GetAll(Guid queue)
+        public Task Delete(Guid constraintId)
         {
-            return ConstraintsRepository.GetAll(queue);
-        }
-
-        public Task Delete(Guid id)
-        {
-            return ConstraintsRepository.Delete(id);
+            return ConstraintsRepository.Delete(constraintId);
         }
     }
 }

@@ -4,13 +4,13 @@ namespace Queue.Model
 {
     public class Queue
     {
-        public Queue(Guid id, QueueMaskType type)
+        public Queue(Guid queueId, QueueMaskType type)
         {
-            Id = id;
+            QueueId = queueId;
             Type = type;
         }
 
-        public Guid Id { get; }
+        public Guid QueueId { get; }
         public QueueMaskType Type { get; }
     }
 
