@@ -30,7 +30,8 @@ namespace Queue.Services
         {
             var masks = await ConstraintsRepository.GetMasks(queue);
             var constraint = new Constraint(Guid.NewGuid(), queue, Sequence.FirstNotIn(masks), name);
-            return await ConstraintsRepository.Create(queue, constraint);
+            await ConstraintsRepository.Create(queue, constraint);
+            return constraint;
         }
 
         public Task<IEnumerable<Constraint>> GetAll(Guid queue)

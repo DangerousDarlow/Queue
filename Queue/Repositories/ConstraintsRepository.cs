@@ -13,7 +13,7 @@ namespace Queue.Repositories
     {
         Task<IEnumerable<Constraint>> GetAll(Guid queue);
         Task<IEnumerable<long>> GetMasks(Guid queue);
-        Task<Constraint> Create(Guid queue, Constraint constraint);
+        Task Create(Guid queue, Constraint constraint);
         Task Delete(Guid id);
     }
 
@@ -45,7 +45,7 @@ namespace Queue.Repositories
             return await Connection.QueryAsync<long>(query, new {queue});
         }
 
-        public async Task<Constraint> Create(Guid queue, Constraint constraint)
+        public async Task Create(Guid queue, Constraint constraint)
         {
             await OpenConnectionIfNotOpen();
 
@@ -53,8 +53,6 @@ namespace Queue.Repositories
                 "INSERT INTO constraints(id, queue, mask, name) VALUES(UUID_TO_BIN(@id), UUID_TO_BIN(@queue), @mask, @name)";
 
             await Connection.ExecuteAsync(query, constraint);
-
-            return constraint;
         }
 
         public async Task Delete(Guid id)
