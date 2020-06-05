@@ -35,7 +35,7 @@ namespace Queue
                 }.ConnectionString));
 
             services.AddSingleton<IConstraintsRepository, ConstraintsRepository>();
-            services.AddSingleton<IPrimeNumbers, PrimeNumbers>();
+            services.AddSingleton<ISequence, PowersOfTwoSequence>();
             
             SqlMapper.AddTypeHandler(new GuidTypeHandler());
             SqlMapper.RemoveTypeMap(typeof(Guid));

@@ -12,28 +12,28 @@ namespace Queue.Repositories
 {
     public interface IConstraintsRepository
     {
-        Task<IEnumerable<Constraint>> Get(Guid queue);
+        Task<IEnumerable<Constraint>> GetAll(Guid queue);
         Task<Constraint> Create(Guid queue, string name);
         Task Delete(Guid id);
     }
 
     public class ConstraintsRepository : IConstraintsRepository
     {
-        public ConstraintsRepository(MySqlConnection connection, IPrimeNumbers primeNumbers)
+        public ConstraintsRepository(MySqlConnection connection, ISequence sequence)
         {
             Connection = connection;
-            PrimeNumbers = primeNumbers;
+            Sequence = sequence;
         }
 
         private MySqlConnection Connection { get; }
-        private IPrimeNumbers PrimeNumbers { get; }
+        private ISequence Sequence { get; }
 
-        public async Task<IEnumerable<Constraint>> Get(Guid queue)
+        public async Task<IEnumerable<Constraint>> GetAll(Guid queue)
         {
             await OpenConnectionIfNotOpen();
 
             const string query =
-                "SELECT BIN_TO_UUID(id) AS id, BIN_TO_UUID(queue) AS queue, prime, name FROM constraints WHERE queue = UUID_TO_BIN(@queue)";
+                "SELECT BIN_TO_UUID(id) AS id, BIN_TO_UUID(queue) AS queue, mask, name FROM constraints WHERE queue = UUID_TO_BIN(@queue)";
 
             return (await Connection.QueryAsync<Constraint>(query, new {queue})).ToList();
         }
@@ -42,12 +42,12 @@ namespace Queue.Repositories
         {
             await OpenConnectionIfNotOpen();
 
-            var primes = await GetPrimesForQueue(queue);
+            var masks = await GetCurrentMasks(queue);
 
-            var constraint = new Constraint(Guid.NewGuid(), queue, PrimeNumbers.FirstPrimeNotIn(primes), name);
+            var constraint = new Constraint(Guid.NewGuid(), queue, Sequence.FirstNotIn(masks), name);
 
             const string query =
-                "INSERT INTO constraints(id, queue, prime, name) VALUES(UUID_TO_BIN(@id), UUID_TO_BIN(@queue), @prime, @name)";
+                "INSERT INTO constraints(id, queue, mask, name) VALUES(UUID_TO_BIN(@id), UUID_TO_BIN(@queue), @mask, @name)";
 
             await Connection.ExecuteAsync(query, constraint);
 
@@ -69,9 +69,9 @@ namespace Queue.Repositories
                 await Connection.OpenAsync();
         }
 
-        private Task<IEnumerable<long>> GetPrimesForQueue(Guid queue)
+        private Task<IEnumerable<long>> GetCurrentMasks(Guid queue)
         {
-            const string query = "SELECT prime FROM queue.constraints WHERE queue = UUID_TO_BIN(@queue) ORDER BY prime";
+            const string query = "SELECT mask FROM queue.constraints WHERE queue = UUID_TO_BIN(@queue) ORDER BY mask";
             return Connection.QueryAsync<long>(query, new {queue});
         }
     }

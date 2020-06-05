@@ -20,9 +20,9 @@ namespace Queue.Controllers
 
         [HttpGet]
         [Route("/constraints")]
-        public async Task<IEnumerable<Constraint>> Get([FromForm] Guid queue)
+        public async Task<IEnumerable<Constraint>> GetAll([FromForm] Guid queue)
         {
-            return await ConstraintsRepository.Get(queue);
+            return await ConstraintsRepository.GetAll(queue);
         }
 
         [HttpPost]
